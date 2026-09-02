@@ -60,11 +60,12 @@ cargo test -p counter-app-worker --test scripts_contract
 CI clippy uses `-- -D warnings` on the same packages (job clears global `RUSTFLAGS`
 only when needed; deny is via the clippy flag).
 
-### leptos-lints (local; hydrate UI)
+### leptos-lints (CI job `leptos-lints`)
 
 Needs `cargo-dylint` / `dylint-link` 6.0.1 and toolchain `nightly-2025-05-14`
 (see `leptos-lints@v0.1.2`). Workspace `[workspace.metadata.dylint]` pins the
 library; rustc deny names are declared under `[workspace.lints.rust]`.
+GitHub Actions runs the same command.
 
 ```bash
 # cargo install cargo-dylint --locked --version 6.0.1
