@@ -1,0 +1,117 @@
+[package]
+name = "counter-app"
+version = "0.1.0"
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Example product app demonstrating Unified Field integration patterns"
+
+[lints]
+workspace = true
+
+[dependencies]
+leptos.workspace = true
+leptos_meta.workspace = true
+leptos_router.workspace = true
+leptos_axum = { workspace = true, optional = true }
+
+icondata.workspace = true
+icondata_core.workspace = true
+turf.workspace = true
+
+http.workspace = true
+cfg-if.workspace = true
+thiserror.workspace = true
+anyhow.workspace = true
+
+serde.workspace = true
+serde_json.workspace = true
+axum = { workspace = true, optional = true, features = ["ws"] }
+axum-login = { workspace = true, optional = true }
+
+valence = { workspace = true, optional = true }
+async-trait = { workspace = true, optional = true }
+
+orbital = { workspace = true, default-features = false }
+uf-integrations = { workspace = true, default-features = false }
+lepton-shell = { workspace = true, default-features = false }
+orbital-macros = { workspace = true }
+uf-product-macros = { workspace = true }
+uf-product = { workspace = true, default-features = false, optional = true }
+
+higgs = { workspace = true, features = ["ssr"], optional = true }
+inventory = { workspace = true }
+counter-app-worker = { workspace = true, optional = true }
+
+photon = { workspace = true, optional = true }
+photon-leptos = { workspace = true, default-features = false, optional = true }
+futures = { version = "0.3", optional = true }
+tokio = { workspace = true, optional = true, features = ["rt"] }
+log = { workspace = true, optional = true }
+spectra = { workspace = true, optional = true }
+spectra-core = { workspace = true, optional = true }
+counter-app-spectra-topics = { workspace = true, optional = true }
+orbital-paging = { workspace = true, features = ["leptos"] }
+wasm-bindgen = { workspace = true, optional = true }
+js-sys = { workspace = true, optional = true }
+web-sys = { workspace = true, optional = true, features = [
+    "Document",
+    "Element",
+    "HtmlElement",
+    "Node",
+    "Window",
+    "Performance",
+] }
+
+[features]
+default = []
+hydrate = [
+    "leptos/hydrate",
+    "orbital/hydrate",
+    "dep:uf-product",
+    "uf-product/hydrate",
+    "uf-integrations/hydrate",
+    "lepton-shell/hydrate",
+    "orbital-paging/hydrate",
+    "dep:photon",
+    "dep:photon-leptos",
+    "photon-leptos/hydrate",
+    "dep:wasm-bindgen",
+    "dep:web-sys",
+    "dep:js-sys",
+]
+ssr = [
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+    "dep:leptos_axum",
+    "dep:axum",
+    "dep:axum-login",
+    "dep:valence",
+    "dep:async-trait",
+    "orbital/ssr",
+    "uf-integrations/ssr",
+    "lepton-shell/ssr",
+    "orbital-paging/ssr",
+    "dep:counter-app-worker",
+    "dep:higgs",
+    "dep:uf-product",
+    "uf-product/ssr",
+    "dep:photon",
+    "photon/runtime",
+    "dep:photon-leptos",
+    "photon-leptos/ssr",
+    "dep:log",
+    "dep:futures",
+    "dep:tokio",
+    "dep:spectra",
+    "dep:spectra-core",
+    "dep:counter-app-spectra-topics",
+]
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+higgs = { workspace = true, default-features = false, features = ["ssr"] }

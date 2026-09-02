@@ -1,0 +1,75 @@
+[package]
+name = "counter-latency-bench"
+version = "0.1.0"
+edition = "2021"
+description = "Tiered Valence read/write latency harness for Counter/UserCounter"
+license = "MIT"
+repository = "https://github.com/unified-field-dev/counter-app"
+
+[[bin]]
+name = "counter-latency-bench"
+path = "src/main.rs"
+
+[lints]
+workspace = true
+
+[features]
+default = []
+kv-surrealkv = ["surrealdb/kv-surrealkv"]
+bench-rocksdb-direct = ["dep:surrealdb-rocksdb"]
+tier-boson = [
+    "dep:boson",
+    "dep:boson-coordinator",
+    "dep:boson-backend-mem",
+    "dep:boson-core",
+    "dep:boson-runtime",
+    "dep:boson-valence-identity",
+    "boson/mem",
+]
+tier-spectra = []
+tier-photon = ["dep:photon", "photon/runtime", "photon/mem"]
+tier-spectra-composite = [
+    "tier-photon",
+    "tier-soliton",
+    "dep:spectra",
+    "spectra/mem",
+]
+tier-chronon = [
+    "tier-boson",
+    "tier-spectra",
+    "tier-photon",
+    "tier-spectra-composite",
+    "dep:chronon-coordinator",
+]
+tier-soliton = ["dep:soliton"]
+tier-full = [
+    "tier-boson",
+    "tier-spectra",
+    "tier-spectra-composite",
+    "tier-chronon",
+    "tier-soliton",
+]
+
+[dependencies]
+anyhow = { workspace = true }
+clap = { version = "4", features = ["derive"] }
+counter-app-worker = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+valence = { workspace = true, features = ["surreal"] }
+
+surrealdb = { workspace = true, default-features = false, features = ["kv-mem", "kv-rocksdb"] }
+reqwest = { version = "0.12", default-features = false, features = ["rustls-tls"] }
+surrealdb-rocksdb = { version = "0.24.0-surreal.5", optional = true, default-features = false }
+boson = { workspace = true, optional = true, default-features = false, features = ["mem"] }
+boson-coordinator = { workspace = true, optional = true }
+boson-backend-mem = { workspace = true, optional = true }
+boson-core = { workspace = true, optional = true }
+boson-runtime = { workspace = true, optional = true, default-features = false }
+boson-valence-identity = { workspace = true, optional = true }
+chronon-coordinator = { workspace = true, optional = true }
+photon = { workspace = true, optional = true, default-features = false, features = ["runtime", "mem"] }
+spectra = { workspace = true, optional = true }
+spectra-core = { workspace = true }
+soliton = { workspace = true, optional = true }

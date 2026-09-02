@@ -1,0 +1,12 @@
+/target
+/target-*
+**/*.rs.bk
+.DS_Store
+Cargo.lock.bak
+.cargo/
+node_modules/
+**/node_modules/
+examples/counter-ui-e2e/site/
+examples/counter-ui-e2e/end2end/test-results/
+examples/counter-ui-e2e/end2end/playwright-report/
+**/playwright-report/

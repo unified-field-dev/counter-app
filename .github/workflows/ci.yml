@@ -1,0 +1,151 @@
+# PR / merge gate aligned with docs/VERIFICATION.md (worker + teaching host).
+# Standalone checkout — UF deps resolve via git branch = main on unified-field-dev.
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+permissions:
+  contents: read
+
+env:
+  CARGO_TERM_COLOR: always
+  CARGO_BUILD_JOBS: 1
+  CARGO_TARGET_DIR: target-counter-app
+  CARGO_INCREMENTAL: 0
+  CARGO_PROFILE_DEV_DEBUG: "0"
+  RUST_BACKTRACE: 1
+  # Leptos workspace deps enable the `nightly` feature.
+  RUSTFLAGS: "-D warnings"
+
+jobs:
+  fmt:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+          components: rustfmt
+      - name: cargo fmt --check
+        run: >
+          cargo fmt -p counter-app-worker -p local-counter-host -- --check
+
+  clippy:
+    runs-on: ubuntu-latest
+    env:
+      RUSTFLAGS: ""
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+          components: clippy
+      - name: cargo clippy (worker + shell helpers + host)
+        run: |
+          cargo clippy -p counter-app-worker --all-targets -- -D warnings
+          cargo clippy -p local-counter-host --all-targets -- -D warnings
+
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+      - name: cargo test (sibling-source UI contracts)
+        run: cargo test -p counter-app-worker --test workspace_members --test product_surface
+      - name: cargo test (counter workflow + shell helpers)
+        run: |
+          cargo test -p counter-app-worker --test counter_workflow_contract
+          cargo test -p counter-app-worker --test high_scores_contract
+          cargo test -p counter-app-worker --test scripts_contract
+      - name: cargo check + run (local-counter-host)
+        run: |
+          cargo check -p local-counter-host
+          cargo run -p local-counter-host
+
+  docs:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+      - name: cargo doc (worker + spectra + ui ssr)
+        env:
+          RUSTDOCFLAGS: "-D rustdoc::broken-intra-doc-links"
+        run: |
+          cargo doc -p counter-app-worker -p counter-app-spectra-topics --no-deps
+          cargo doc -p counter-app --features ssr --no-deps
+
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+          targets: wasm32-unknown-unknown
+      - name: Install cargo-leptos
+        run: cargo install cargo-leptos --locked --version 0.3.6
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: examples/counter-ui-e2e/end2end/package-lock.json
+      - name: Install npm dependencies
+        working-directory: examples/counter-ui-e2e/end2end
+        run: npm ci
+      - name: Get Playwright version
+        id: pw-version
+        working-directory: examples/counter-ui-e2e/end2end
+        run: echo "version=$(node -p "require('./package-lock.json').packages['node_modules/@playwright/test'].version")" >> $GITHUB_OUTPUT
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ steps.pw-version.outputs.version }}-counter-app
+      - name: Install Playwright browsers
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
+        working-directory: examples/counter-ui-e2e/end2end
+        run: npx playwright install --with-deps chromium
+      - name: Install Playwright OS deps when cache hit
+        if: steps.playwright-cache.outputs.cache-hit == 'true'
+        working-directory: examples/counter-ui-e2e/end2end
+        run: npx playwright install-deps chromium
+      - name: cargo leptos end-to-end
+        env:
+          CI: true
+        run: cargo leptos end-to-end --project counter-ui-e2e
+      - name: Upload Playwright artifacts on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-artifacts-counter-app-${{ github.run_id }}
+          path: |
+            examples/counter-ui-e2e/end2end/playwright-report/
+            examples/counter-ui-e2e/end2end/test-results/
+          if-no-files-found: ignore
+
+  leptos-lints:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+      - uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c # master (pin)
+        with:
+          toolchain: nightly-2026-08-07
+      - name: Install cargo-dylint
+        run: |
+          cargo install cargo-dylint --locked --version 6.0.1 --force
+          cargo install dylint-link --locked --version 6.0.1 --force
+      - name: Install leptos-lints nightly toolchain
+        run: rustup toolchain install nightly-2025-05-14 --component rustc-dev,llvm-tools-preview
+      - name: cargo dylint (counter-app hydrate)
+        env:
+          CARGO_RESOLVER_INCOMPATIBLE_RUST_VERSIONS: fallback
+          RUSTFLAGS: "-D warnings -Zcrate-attr=feature(stdarch_x86_avx512)"
+        run: cargo dylint --all -p counter-app --no-deps -- --features hydrate
+

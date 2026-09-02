@@ -1,0 +1,23 @@
+[package]
+name = "local-counter-host"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Canonical local host: Valence mem + counter-app-worker get/increment/set under protected /counter"
+
+[lints]
+workspace = true
+
+[dependencies]
+axum = { version = "0.8", default-features = false, features = ["tokio", "http1", "json"] }
+counter-app-worker = { path = "../../counter-app-worker" }
+http-body-util = "0.1"
+serde_json = { workspace = true }
+tokio = { workspace = true }
+tower = { version = "0.5", features = ["util"] }
+valence = { workspace = true }

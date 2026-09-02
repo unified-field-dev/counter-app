@@ -1,0 +1,103 @@
+[package]
+name = "counter-ui-e2e"
+version = "0.1.0"
+edition = "2021"
+publish = false
+license.workspace = true
+description = "Leptos host + Playwright for counter-app CounterRoutes (eager) + Photon"
+
+[lints]
+workspace = true
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+anyhow = { workspace = true, optional = true }
+async-trait = { workspace = true, optional = true }
+axum = { workspace = true, optional = true }
+chrono = { workspace = true, optional = true }
+console_error_panic_hook = { workspace = true, optional = true }
+console_log = { workspace = true, optional = true }
+counter-app = { path = "../../counter-app", default-features = false }
+counter-app-worker = { workspace = true, optional = true }
+higgs = { workspace = true, optional = true }
+higgs-identity = { workspace = true, optional = true }
+icondata = { workspace = true }
+lepton-identity = { workspace = true, optional = true }
+leptos = { workspace = true }
+leptos_axum = { workspace = true, optional = true, default-features = true }
+leptos_meta = { workspace = true }
+leptos_router = { workspace = true }
+log = { workspace = true, optional = true }
+orbital = { workspace = true, default-features = false }
+photon = { workspace = true, optional = true }
+photon-axum = { workspace = true, optional = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+simple_logger = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+tower-http = { version = "0.6", features = ["fs"], optional = true }
+tower-sessions = { workspace = true, optional = true }
+any_spawner = { workspace = true, optional = true }
+gauge = { workspace = true, default-features = false, optional = true }
+uf-integrations = { workspace = true, default-features = false }
+uf-product = { workspace = true, default-features = false }
+valence = { workspace = true, optional = true }
+wasm-bindgen = { workspace = true, optional = true }
+
+[features]
+default = []
+hydrate = [
+    "leptos/hydrate",
+    "counter-app/hydrate",
+    "orbital/hydrate",
+    "uf-product/hydrate",
+    "uf-integrations/hydrate",
+    "dep:console_error_panic_hook",
+    "dep:console_log",
+    "dep:wasm-bindgen",
+    "dep:log",
+]
+ssr = [
+    "leptos/ssr",
+    "leptos_meta/ssr",
+    "leptos_router/ssr",
+    "counter-app/ssr",
+    "orbital/ssr",
+    "uf-product/ssr",
+    "uf-integrations/ssr",
+    "dep:axum",
+    "dep:leptos_axum",
+    "dep:tokio",
+    "dep:tower-http",
+    "dep:tower-sessions",
+    "dep:anyhow",
+    "dep:simple_logger",
+    "dep:log",
+    "dep:any_spawner",
+    "dep:chrono",
+    "dep:async-trait",
+    "dep:higgs",
+    "higgs/ssr",
+    "dep:higgs-identity",
+    "dep:valence",
+    "valence/sqlite",
+    "dep:lepton-identity",
+    "dep:gauge",
+    "gauge/ssr",
+    "dep:counter-app-worker",
+    "dep:photon",
+    "photon/runtime",
+    "dep:photon-axum",
+    "photon-axum/runtime",
+]
+
+[[bin]]
+name = "counter-ui-e2e"
+path = "src/main.rs"
+required-features = ["ssr"]
+
+[target.'cfg(target_arch = "wasm32")'.dependencies]
+getrandom = { workspace = true }
+getrandom_03 = { workspace = true }

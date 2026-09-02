@@ -1,0 +1,51 @@
+[package]
+name = "counter-app-worker"
+version = "0.1.0"
+edition = "2021"
+license.workspace = true
+authors.workspace = true
+repository.workspace = true
+homepage.workspace = true
+documentation.workspace = true
+description = "Leptos-free counter example: Valence schemas, Chronon scripts, Boson tasks, Photon topics"
+
+[lints]
+workspace = true
+
+[features]
+default = ["db-sqlite"]
+db-sqlite = ["valence/sqlite"]
+db-hybrid = ["valence/hybrid"]
+
+[dependencies]
+valence = { workspace = true, default-features = false }
+chronon-coordinator = { workspace = true }
+chronon-coordinator-macros = { workspace = true }
+chronon-core = { workspace = true }
+chronon-executor = { workspace = true }
+chronon-valence-identity = { workspace = true }
+boson-core.workspace = true
+boson-runtime = { workspace = true, default-features = false }
+boson-valence-identity = { workspace = true }
+quark = { workspace = true }
+boson-macros = { workspace = true }
+photon = { workspace = true, default-features = false, features = ["runtime"] }
+lepton-identity = { workspace = true }
+uf-notifications-core = { workspace = true }
+orbital-paging = { workspace = true, default-features = false }
+
+chrono = { workspace = true, features = ["serde"] }
+uuid.workspace = true
+log.workspace = true
+futures = { version = "0.3", default-features = false, features = ["alloc"] }
+async-trait.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+anyhow.workspace = true
+thiserror.workspace = true
+
+[dev-dependencies]
+tokio = { workspace = true, features = ["macros", "rt-multi-thread"] }
+
+[build-dependencies]
+valence-codegen = { workspace = true }
