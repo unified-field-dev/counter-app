@@ -7,7 +7,7 @@ authors.workspace = true
 repository.workspace = true
 homepage.workspace = true
 documentation.workspace = true
-description = "Example product app demonstrating Unified Field integration patterns"
+description = "Reference counter product app for exercising Unified Field host wiring."
 
 [lints]
 workspace = true
