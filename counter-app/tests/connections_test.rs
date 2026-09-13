@@ -95,7 +95,7 @@ async fn get_from_user_id_returns_seeded_row() {
     let created = UserCounter::create_used(
         UserCounter::new(RecordId::new("user", "alice"), 7).expect("new"),
         &v,
-        valence::use_!("create UserCounter in counter-app/tests/connections_test.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .expect("create");

@@ -61,7 +61,7 @@ pub async fn get_high_scores_page(
     // slice — follow-up pages used to set `total_count: None` and used `db_rows_fetched > limit`,
     // which keeps `has_more` true after the final full fetch and hides the end-of-list UI.
     let total_rows = u64::try_from(
-        UserCounter::query_used(&v_scores, valence::use_!("query UserCounter in components/high_scores/server.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+        UserCounter::query_used(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
             .await
             .map_err(|e| into_server_error(ctx_valence_err("get_high_scores_page count", e)))?
             .len(),
@@ -69,7 +69,7 @@ pub async fn get_high_scores_page(
     .unwrap_or(u64::MAX);
     let total_count = Some(total_rows);
 
-    let counters = UserCounter::query_used(&v_scores, valence::use_!("query UserCounter in components/high_scores/server.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+    let counters = UserCounter::query_used(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
         .order_by_value(valence::SortDirection::Desc)
         .limit(fetch_n)
         .offset(offset)

@@ -28,10 +28,10 @@ pub(super) async fn backfill_bot_counter(
     let user_id_clean = valence::extract_id_from_record(&user_record)
         .map_err(|e| anyhow::anyhow!("Bot user {} invalid ID: {e}", bot.email))?;
 
-    if UserCounter::get_used(&user_id_clean, valence, valence::use_!("get UserCounter in scripts/ensure_bot_users/counter.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?.is_none() {
+    if UserCounter::get_used(&user_id_clean, valence, valence::use_!(r#"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?.is_none() {
         let counter = UserCounter::new(user_record, bot.reset_score)
             .map_err(|e| anyhow::anyhow!("Failed to create UserCounter for {}: {e}", bot.email))?;
-        UserCounter::upsert_used(&user_id_clean, counter, valence, valence::use_!("upsert UserCounter in scripts/ensure_bot_users/counter.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
+        UserCounter::upsert_used(&user_id_clean, counter, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to upsert UserCounter for {}: {e}", bot.email))?;
         log::info!(

@@ -73,7 +73,7 @@ pub async fn seed_counters(
         "singleton",
         Counter::new(seed_value).context("Counter::new for seed")?,
         &v_seed,
-        valence::use_!("upsert Counter in src/stack/tier0.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **Counter** save for `stack` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .context("seed Counter singleton")?;
@@ -82,7 +82,7 @@ pub async fn seed_counters(
         &user_pk,
         UserCounter::new(user_record, seed_value).context("UserCounter::new for seed")?,
         &v_seed,
-        valence::use_!("upsert UserCounter in src/stack/tier0.rs; Valence persistence for this feature path; typed store; visible to test harness."),
+        valence::use_!(r#"**Test:** Fixture **User Counter** save for `stack` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#),
     )
     .await
     .context("seed UserCounter")?;
