@@ -55,7 +55,7 @@ async fn create_user(
     )
     .map_err(|e| anyhow::anyhow!("Failed to create user for {}: {e}", bot.email))?;
 
-    let user_created = User::create(user, valence)
+    let user_created = User::create_used(user, valence, valence::use_!("create User in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create user for {}: {e}", bot.email))?;
     let user_thing = user_created
@@ -85,7 +85,7 @@ async fn create_account(
     )
     .map_err(|e| anyhow::anyhow!("Failed to create account for {}: {e}", bot.email))?;
 
-    let account_created = Account::create(account, valence)
+    let account_created = Account::create_used(account, valence, valence::use_!("create Account in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create account for {}: {e}", bot.email))?;
     let account_thing = account_created
@@ -107,7 +107,7 @@ async fn create_and_link_email(
 
     let email_row = AccountEmail::new(account_thing, bot.email.to_string(), Some(now), now, now)
         .map_err(|e| anyhow::anyhow!("Failed to build AccountEmail for {}: {e}", bot.email))?;
-    let email_created = AccountEmail::create(email_row, valence)
+    let email_created = AccountEmail::create_used(email_row, valence, valence::use_!("create AccountEmail in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create AccountEmail for {}: {e}", bot.email))?;
     let email_thing = email_created
@@ -116,7 +116,7 @@ async fn create_and_link_email(
         .ok_or_else(|| anyhow::anyhow!("Bot email {} missing id after create", bot.email))?;
 
     account_created
-        .get_mutable(valence)
+        .get_mutable_used(valence, valence::use_!("get_mutable via create.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_primary_email(email_thing.clone())
         .map_err(|e| anyhow::anyhow!("Failed to set account primary email for {}: {e}", bot.email))?
         .set_updated_at(now)
@@ -131,7 +131,7 @@ async fn create_and_link_email(
         })?;
 
     user_created
-        .get_mutable(valence)
+        .get_mutable_used(valence, valence::use_!("get_mutable via create.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_primary_email(email_thing)
         .map_err(|e| anyhow::anyhow!("Failed to set user primary email for {}: {e}", bot.email))?
         .set_updated_at(now)
@@ -165,7 +165,7 @@ async fn create_membership_and_profile(
         now,
     )
     .map_err(|e| anyhow::anyhow!("Failed to build membership for {}: {e}", bot.email))?;
-    AccountMembership::create(membership, valence)
+    AccountMembership::create_used(membership, valence, valence::use_!("create AccountMembership in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create membership for {}: {e}", bot.email))?;
 
@@ -179,7 +179,7 @@ async fn create_membership_and_profile(
     )
     .map_err(|e| anyhow::anyhow!("Failed to build UserProfile for {}: {e}", bot.email))?;
 
-    UserProfile::create(profile, valence)
+    UserProfile::create_used(profile, valence, valence::use_!("create UserProfile in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create UserProfile for {}: {e}", bot.email))?;
 
@@ -194,7 +194,7 @@ async fn upsert_bot_counter(valence: &Valence, bot: &BotDef, user_thing: RecordI
 
     let counter = UserCounter::new(user_thing, bot.reset_score)
         .map_err(|e| anyhow::anyhow!("Failed to create UserCounter for {}: {e}", bot.email))?;
-    UserCounter::upsert(&user_id_clean, counter, valence)
+    UserCounter::upsert_used(&user_id_clean, counter, valence, valence::use_!("upsert UserCounter in scripts/ensure_bot_users/create.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to upsert UserCounter for {}: {e}", bot.email))?;
 

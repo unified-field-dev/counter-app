@@ -165,7 +165,7 @@ fn ensure_may_mutate_user_counter(v: &Valence, user_id: &str) -> Result<(), Coun
 /// ```
 pub async fn get_global(v: &Valence) -> Result<CounterResponse, CounterServiceError> {
     // Generated model API: `Counter::get(id, &valence)` — missing row is fine (→ 0).
-    let counter = Counter::get("singleton", v).await?;
+    let counter = Counter::get_used("singleton", v, valence::use_!("get Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let value = counter.map_or(0, |c| count_to_usize(*c.value()));
     Ok(CounterResponse { value })
 }
@@ -203,12 +203,12 @@ pub async fn increment_global(
     validate_increment_amount(amount)?;
     let amount_i64 = amount_as_i64(amount)?;
 
-    let counter = Counter::get("singleton", v).await?;
+    let counter = Counter::get_used("singleton", v, valence::use_!("get Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let updated = if let Some(counter) = counter {
         // Existing row: get_mutable → field setter → commit (Valence unit of work).
         let next = counter.value() + amount_i64;
         counter
-            .get_mutable(v)
+            .get_mutable_used(v, valence::use_!("get_mutable via service.rs; mutable handle for in-place update; typed store; session/service path."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -217,7 +217,7 @@ pub async fn increment_global(
         // First write: build a new model and upsert under the fixed singleton id.
         let new_counter =
             Counter::new(amount_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        Counter::upsert("singleton", new_counter, v).await?
+        Counter::upsert_used("singleton", new_counter, v, valence::use_!("upsert Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?
     };
 
     Ok(CounterResponse {
@@ -253,7 +253,7 @@ pub async fn set_global(value: usize, v: &Valence) -> Result<CounterResponse, Co
     let new_counter =
         Counter::new(value_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
     // Upsert = replace-or-create under a stable id (admin/demo absolute write).
-    let updated = Counter::upsert("singleton", new_counter, v).await?;
+    let updated = Counter::upsert_used("singleton", new_counter, v, valence::use_!("upsert Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     Ok(CounterResponse {
         value: count_to_usize(*updated.value()),
     })
@@ -285,10 +285,10 @@ pub async fn get_user(
     user_id: &str,
     v: &Valence,
 ) -> Result<UserCounterResponse, CounterServiceError> {
-    let user_counter = UserCounter::get(user_id, v).await?;
+    let user_counter = UserCounter::get_used(user_id, v, valence::use_!("get UserCounter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let user_count = user_counter.map_or(0, |c| count_to_usize(*c.value()));
 
-    let global_counter = Counter::get("singleton", v).await?;
+    let global_counter = Counter::get_used("singleton", v, valence::use_!("get Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let global_count = global_counter.map_or(0, |c| count_to_usize(*c.value()));
 
     Ok(UserCounterResponse {
@@ -342,11 +342,11 @@ pub async fn increment_user(
     let user_thing = RecordId::new("user", bare_record_id(user_id));
 
     // --- personal UserCounter ---
-    let user_counter = UserCounter::get(user_id, v).await?;
+    let user_counter = UserCounter::get_used(user_id, v, valence::use_!("get UserCounter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let new_user_val = if let Some(counter) = user_counter {
         let next = counter.value() + amount_i64;
         let updated = counter
-            .get_mutable(v)
+            .get_mutable_used(v, valence::use_!("get_mutable via service.rs; mutable handle for in-place update; typed store; session/service path."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -356,16 +356,16 @@ pub async fn increment_user(
     } else {
         let new_counter = UserCounter::new(user_thing, amount_i64)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        let updated = UserCounter::upsert(user_id, new_counter, v).await?;
+        let updated = UserCounter::upsert_used(user_id, new_counter, v, valence::use_!("upsert UserCounter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
         count_to_usize(*updated.value())
     };
 
     // --- shared global Counter (same pattern as increment_global) ---
-    let global_counter = Counter::get("singleton", v).await?;
+    let global_counter = Counter::get_used("singleton", v, valence::use_!("get Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
     let new_global_val = if let Some(counter) = global_counter {
         let next = counter.value() + amount_i64;
         let updated = counter
-            .get_mutable(v)
+            .get_mutable_used(v, valence::use_!("get_mutable via service.rs; mutable handle for in-place update; typed store; session/service path."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -374,7 +374,7 @@ pub async fn increment_user(
     } else {
         let new_counter =
             Counter::new(amount_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        let updated = Counter::upsert("singleton", new_counter, v).await?;
+        let updated = Counter::upsert_used("singleton", new_counter, v, valence::use_!("upsert Counter in counter-app-worker/src/service.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
         count_to_usize(*updated.value())
     };
 

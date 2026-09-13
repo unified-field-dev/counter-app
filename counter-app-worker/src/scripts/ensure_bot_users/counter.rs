@@ -28,10 +28,10 @@ pub(super) async fn backfill_bot_counter(
     let user_id_clean = valence::extract_id_from_record(&user_record)
         .map_err(|e| anyhow::anyhow!("Bot user {} invalid ID: {e}", bot.email))?;
 
-    if UserCounter::get(&user_id_clean, valence).await?.is_none() {
+    if UserCounter::get_used(&user_id_clean, valence, valence::use_!("get UserCounter in scripts/ensure_bot_users/counter.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?.is_none() {
         let counter = UserCounter::new(user_record, bot.reset_score)
             .map_err(|e| anyhow::anyhow!("Failed to create UserCounter for {}: {e}", bot.email))?;
-        UserCounter::upsert(&user_id_clean, counter, valence)
+        UserCounter::upsert_used(&user_id_clean, counter, valence, valence::use_!("upsert UserCounter in scripts/ensure_bot_users/counter.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to upsert UserCounter for {}: {e}", bot.email))?;
         log::info!(

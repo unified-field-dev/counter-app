@@ -36,7 +36,7 @@ pub async fn daily_highscores_reset(ctx: Box<dyn chronon_core::ScriptContext>) -
 /// Valence-taking core of [`daily_highscores_reset`] (contract tests call this directly).
 pub async fn daily_highscores_reset_with_valence(valence: &Valence) -> Result<()> {
     // Query all UserCounter records
-    let counters = UserCounter::query(valence).await?;
+    let counters = UserCounter::query_used(valence, valence::use_!("query UserCounter in src/scripts/daily_highscores_reset.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
 
     log::info!(
         "[counter-app-worker] daily_highscores_reset: Resetting {} user counters",
@@ -55,7 +55,7 @@ pub async fn daily_highscores_reset_with_valence(valence: &Valence) -> Result<()
         // Resolve the user's email to determine whether this is a bot.
         let record_id = extract_id_from_record(counter.user())?;
 
-        let reset_value = match GeneratedUser::get(&record_id, valence).await {
+        let reset_value = match GeneratedUser::get_used(&record_id, valence, valence::use_!("get GeneratedUser in src/scripts/daily_highscores_reset.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await {
             Ok(Some(user)) => super::user_email::primary_email_address(&user, valence)
                 .await
                 .map_or(0, |email| bot_reset_score(&email).unwrap_or(0)),
@@ -67,7 +67,7 @@ pub async fn daily_highscores_reset_with_valence(valence: &Valence) -> Result<()
         }
 
         counter
-            .get_mutable(valence)
+            .get_mutable_used(valence, valence::use_!("get_mutable via daily_highscores_reset.rs; mutable handle for in-place update; typed store; session/service path."))
             .set_value(reset_value)
             .map_err(|e| anyhow::anyhow!("Failed to set value for counter {counter_id}: {e}"))?
             .commit()
@@ -78,11 +78,11 @@ pub async fn daily_highscores_reset_with_valence(valence: &Valence) -> Result<()
     // ── Set the global counter to the first-place score ──────────────
     let first_place_score = max_reset_value;
 
-    let global_counter = Counter::get("singleton", valence).await?;
+    let global_counter = Counter::get_used("singleton", valence, valence::use_!("get Counter in src/scripts/daily_highscores_reset.rs; Valence persistence for this feature path; typed store; visible to session actor / service path.")).await?;
 
     if let Some(counter) = global_counter {
         counter
-            .get_mutable(valence)
+            .get_mutable_used(valence, valence::use_!("get_mutable via daily_highscores_reset.rs; mutable handle for in-place update; typed store; session/service path."))
             .set_value(first_place_score)
             .map_err(|e| anyhow::anyhow!("Failed to set value for global counter: {e}"))?
             .commit()
@@ -92,7 +92,7 @@ pub async fn daily_highscores_reset_with_valence(valence: &Valence) -> Result<()
         let new_counter = Counter::new(first_place_score)
             .map_err(|e| anyhow::anyhow!("Failed to create global counter: {e}"))?;
 
-        Counter::upsert("singleton", new_counter, valence)
+        Counter::upsert_used("singleton", new_counter, valence, valence::use_!("upsert Counter in src/scripts/daily_highscores_reset.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to upsert global counter: {e}"))?;
     }

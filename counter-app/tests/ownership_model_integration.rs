@@ -71,7 +71,7 @@ async fn counter_create_writes_ownership_from_actor() {
         },
     );
 
-    let created = Counter::create(Counter::new(5).expect("new"), &v)
+    let created = Counter::create_used(Counter::new(5).expect("new"), &v, valence::use_!("create Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("create");
     let bare = normalize_record_id_for_ownership(created.id().expect("id").id());
@@ -95,7 +95,7 @@ async fn counter_upsert_update_leaves_owner_unchanged() {
             user_id: "alice".into(),
         },
     );
-    let created = Counter::create(Counter::new(1).expect("new"), &v_alice)
+    let created = Counter::create_used(Counter::new(1).expect("new"), &v_alice, valence::use_!("create Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("create");
     let bare = normalize_record_id_for_ownership(created.id().expect("id").id());
@@ -106,7 +106,7 @@ async fn counter_upsert_update_leaves_owner_unchanged() {
             user_id: "bob".into(),
         },
     );
-    Counter::upsert(&bare, Counter::new(99).expect("new"), &v_bob)
+    Counter::upsert_used(&bare, Counter::new(99).expect("new"), &v_bob, valence::use_!("upsert Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("upsert update");
 
@@ -128,7 +128,7 @@ async fn counter_upsert_create_path_writes_ownership() {
     );
 
     let id = "upsert-create-only-1";
-    let upserted = Counter::upsert(id, Counter::new(2).expect("new"), &v)
+    let upserted = Counter::upsert_used(id, Counter::new(2).expect("new"), &v, valence::use_!("upsert Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("upsert insert");
     let bare = normalize_record_id_for_ownership(upserted.id().expect("id").id());
@@ -151,7 +151,7 @@ async fn counter_delete_marks_ownership_pending_deletion() {
             user_id: "alice".into(),
         },
     );
-    let created = Counter::create(Counter::new(3).expect("new"), &v_alice)
+    let created = Counter::create_used(Counter::new(3).expect("new"), &v_alice, valence::use_!("create Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("create");
     let bare = normalize_record_id_for_ownership(created.id().expect("id").id());
@@ -162,7 +162,7 @@ async fn counter_delete_marks_ownership_pending_deletion() {
             operation: "test-delete".into(),
         },
     );
-    Counter::delete(&bare, &v_system).await.expect("delete");
+    Counter::delete_used(&bare, &v_system, valence::use_!("delete Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await.expect("delete");
 
     let own = OwnershipService::get_ownership_json("counter", &bare, &v_system)
         .await
@@ -188,7 +188,7 @@ async fn counter_create_owner_override_wins_over_actor() {
         owner_kind: valence::OwnerKind::Application,
     });
 
-    let created = Counter::create(Counter::new(4).expect("new"), &v)
+    let created = Counter::create_used(Counter::new(4).expect("new"), &v, valence::use_!("create Counter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("create");
     let bare = normalize_record_id_for_ownership(created.id().expect("id").id());
@@ -254,10 +254,11 @@ async fn user_counter_create_writes_ownership_from_actor() {
         },
     );
 
-    let created = counter_app::generated::UserCounter::create(
+    let created = counter_app::generated::UserCounter::create_used(
         counter_app::generated::UserCounter::new(valence::RecordId::new("user", "alice"), 1)
             .expect("new"),
         &v,
+        valence::use_!("create UserCounter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .expect("create");
@@ -286,10 +287,11 @@ async fn user_counter_update_denied_for_non_owner() {
             user_id: "alice".into(),
         },
     );
-    let created = counter_app::generated::UserCounter::create(
+    let created = counter_app::generated::UserCounter::create_used(
         counter_app::generated::UserCounter::new(valence::RecordId::new("user", "alice"), 3)
             .expect("new"),
         &v_alice,
+        valence::use_!("create UserCounter in counter-app/tests/ownership_model_integration.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .expect("create");
@@ -301,7 +303,7 @@ async fn user_counter_update_denied_for_non_owner() {
         },
     );
     let err = created
-        .get_mutable(&v_bob)
+        .get_mutable_used(&v_bob, valence::use_!("get_mutable via ownership_model_integration.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_value(99)
         .expect("set_value")
         .commit()

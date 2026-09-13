@@ -14,7 +14,7 @@ use valence::{extract_id_from_record, Model, Valence};
 pub async fn primary_email_address(user: &User, valence: &Valence) -> Option<String> {
     let email_id = user.primary_email()?;
     let bare = extract_id_from_record(email_id).ok()?;
-    AccountEmail::get(&bare, valence)
+    AccountEmail::get_used(&bare, valence, valence::use_!("get AccountEmail in src/scripts/user_email.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
         .await
         .ok()
         .flatten()

@@ -254,7 +254,7 @@ async fn user_counter_valence_create_policy_denies_foreign_user_sad() {
         },
     );
     let forged = UserCounter::new(RecordId::new("user", "alice"), 1).expect("new");
-    let err = UserCounter::upsert("alice", forged, &v_bob)
+    let err = UserCounter::upsert_used("alice", forged, &v_bob, valence::use_!("upsert UserCounter in counter-app-worker/tests/counter_workflow_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect_err("Valence create must deny foreign user field");
     assert!(

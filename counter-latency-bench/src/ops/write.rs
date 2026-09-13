@@ -15,12 +15,12 @@ pub async fn run_write_once(v: &Valence, user_pk: &str) -> Result<WriteStepMs> {
     let total_start = Instant::now();
 
     let t0 = Instant::now();
-    let user_counter = UserCounter::get(user_pk, v)
+    let user_counter = UserCounter::get_used(user_pk, v, valence::use_!("get UserCounter in src/ops/write.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .context("UserCounter::get")?
         .context("user_counter row missing — seed failed")?;
     let updated_user = user_counter
-        .get_mutable(v)
+        .get_mutable_used(v, valence::use_!("get_mutable via write.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_value(*user_counter.value() + 1)
         .context("UserCounter set_value")?
         .commit()
@@ -30,12 +30,12 @@ pub async fn run_write_once(v: &Valence, user_pk: &str) -> Result<WriteStepMs> {
     let user_counter_commit_ms = elapsed_ms(t0);
 
     let t1 = Instant::now();
-    let global = Counter::get("singleton", v)
+    let global = Counter::get_used("singleton", v, valence::use_!("get Counter in src/ops/write.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .context("Counter::get")?
         .context("counter singleton missing — seed failed")?;
     let updated_global = global
-        .get_mutable(v)
+        .get_mutable_used(v, valence::use_!("get_mutable via write.rs; mutable handle for in-place update; typed store; session/service path."))
         .set_value(*global.value() + 1)
         .context("Counter set_value")?
         .commit()

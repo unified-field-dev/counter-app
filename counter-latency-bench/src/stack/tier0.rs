@@ -69,18 +69,20 @@ pub async fn seed_counters(
         permission_cache,
     );
 
-    Counter::upsert(
+    Counter::upsert_used(
         "singleton",
         Counter::new(seed_value).context("Counter::new for seed")?,
         &v_seed,
+        valence::use_!("upsert Counter in src/stack/tier0.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .context("seed Counter singleton")?;
 
-    UserCounter::upsert(
+    UserCounter::upsert_used(
         &user_pk,
         UserCounter::new(user_record, seed_value).context("UserCounter::new for seed")?,
         &v_seed,
+        valence::use_!("upsert UserCounter in src/stack/tier0.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .context("seed UserCounter")?;

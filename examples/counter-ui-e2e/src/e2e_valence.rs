@@ -65,7 +65,7 @@ async fn seed_user(id: &str, email_verified: bool, valence: &Valence) {
         now,
     )
     .expect("build user");
-    User::upsert(id, user, valence).await.expect("upsert user");
+    User::upsert_used(id, user, valence, valence::use_!("upsert User in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await.expect("upsert user");
 }
 
 /// Build shared Valence/Higgs once and seed baseline users.
@@ -179,7 +179,7 @@ pub async fn seed_leaderboard_scores() -> anyhow::Result<Vec<(String, i64)>> {
     for (id, score) in rows {
         let user_thing = RecordId::new("user", id);
         let counter = UserCounter::new(user_thing, score)?;
-        UserCounter::upsert(id, counter, &system).await?;
+        UserCounter::upsert_used(id, counter, &system, valence::use_!("upsert UserCounter in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await?;
         out.push((id.to_string(), score));
     }
     Ok(out)
@@ -204,7 +204,7 @@ pub async fn reset_user_counter(user_id: &str) -> anyhow::Result<()> {
     let system = e2e_system_valence();
     let user_thing = RecordId::new("user", user_id);
     let counter = UserCounter::new(user_thing, 0)?;
-    UserCounter::upsert(user_id, counter, &system).await?;
+    UserCounter::upsert_used(user_id, counter, &system, valence::use_!("upsert UserCounter in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness.")).await?;
     Ok(())
 }
 
@@ -232,7 +232,7 @@ async fn ensure_counter_admin_group(system: &Valence) {
         now,
     )
     .expect("build counter admin group");
-    gauge::generated::PermissionGroup::upsert(COUNTER_ADMIN_GROUP_ID, group, system)
+    gauge::generated::PermissionGroup::upsert_used(COUNTER_ADMIN_GROUP_ID, group, system, valence::use_!("upsert PermissionGroup in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("upsert counter admin group");
 }
@@ -240,11 +240,11 @@ async fn ensure_counter_admin_group(system: &Valence) {
 async fn ensure_user_gauge_principal(system: &Valence, user_id: &str) {
     use lepton_identity::generated::User;
 
-    let user = User::get(user_id, system)
+    let user = User::get_used(user_id, system, valence::use_!("get User in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("get seed user")
         .expect("seed user exists");
-    gauge::generated::PermissionUserPrincipal::upsert(
+    gauge::generated::PermissionUserPrincipal::upsert_used(
         &format!("user:{user_id}"),
         gauge::generated::PermissionUserPrincipal::new(
             user.id().expect("user id").clone(),
@@ -252,6 +252,7 @@ async fn ensure_user_gauge_principal(system: &Valence, user_id: &str) {
         )
         .expect("user principal"),
         system,
+        valence::use_!("upsert PermissionUserPrincipal in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .expect("upsert user principal");
@@ -269,13 +270,13 @@ async fn wire_counter_admin_group(grant_actor: &Valence, system: &Valence, user_
         .await
         .expect("grant CounterAdmin to counter_admin group");
 
-    let group = gauge::generated::PermissionGroup::get(COUNTER_ADMIN_GROUP_ID, system)
+    let group = gauge::generated::PermissionGroup::get_used(COUNTER_ADMIN_GROUP_ID, system, valence::use_!("get PermissionGroup in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("get counter_admin group")
         .expect("counter_admin group exists");
     ensure_user_gauge_principal(system, user_id).await;
     let principal =
-        gauge::generated::PermissionUserPrincipal::get(&format!("user:{user_id}"), system)
+        gauge::generated::PermissionUserPrincipal::get_used(&format!("user:{user_id}"), system, valence::use_!("get PermissionUserPrincipal in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
             .await
             .expect("get user principal")
             .expect("user principal exists");
@@ -307,15 +308,15 @@ async fn seed_super_user_with_member(system: &Valence, member_user_id: &str) {
     )
     .expect("build super user group");
     let created =
-        gauge::generated::PermissionGroup::upsert("super_user_group", super_group, system)
+        gauge::generated::PermissionGroup::upsert_used("super_user_group", super_group, system, valence::use_!("upsert PermissionGroup in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
             .await
             .expect("upsert super user group");
 
-    let member = User::get(member_user_id, system)
+    let member = User::get_used(member_user_id, system, valence::use_!("get User in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("query member")
         .expect("member exists");
-    let principal = gauge::generated::PermissionUserPrincipal::upsert(
+    let principal = gauge::generated::PermissionUserPrincipal::upsert_used(
         &format!("user:{member_user_id}"),
         gauge::generated::PermissionUserPrincipal::new(
             member.id().expect("member id").clone(),
@@ -323,6 +324,7 @@ async fn seed_super_user_with_member(system: &Valence, member_user_id: &str) {
         )
         .expect("new principal"),
         system,
+        valence::use_!("upsert PermissionUserPrincipal in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."),
     )
     .await
     .expect("upsert principal");
@@ -337,13 +339,13 @@ async fn seed_super_user_with_member(system: &Valence, member_user_id: &str) {
 }
 
 async fn demote_owner_from_super_user(system: &Valence) {
-    let Some(super_group) = gauge::generated::PermissionGroup::get("super_user_group", system)
+    let Some(super_group) = gauge::generated::PermissionGroup::get_used("super_user_group", system, valence::use_!("get PermissionGroup in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("get super user group")
     else {
         return;
     };
-    let Some(principal) = gauge::generated::PermissionUserPrincipal::get("user:owner", system)
+    let Some(principal) = gauge::generated::PermissionUserPrincipal::get_used("user:owner", system, valence::use_!("get PermissionUserPrincipal in counter-ui-e2e/src/e2e_valence.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("get owner principal")
     else {

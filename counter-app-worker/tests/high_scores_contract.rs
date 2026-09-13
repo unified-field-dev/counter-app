@@ -18,7 +18,7 @@ use valence::{Model, RecordId};
 
 async fn upsert_score(valence: &valence::Valence, user_id: &str, score: i64) {
     let row = UserCounter::new(RecordId::new("user", user_id), score).expect("new");
-    UserCounter::upsert(user_id, row, valence)
+    UserCounter::upsert_used(user_id, row, valence, valence::use_!("upsert UserCounter in counter-app-worker/tests/high_scores_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .await
         .expect("upsert");
 }
@@ -30,7 +30,7 @@ async fn high_scores_ordered_desc_happy() {
     upsert_score(&v, "hs_high", 50).await;
     upsert_score(&v, "hs_mid", 30).await;
 
-    let rows = UserCounter::query(&v)
+    let rows = UserCounter::query_used(&v, valence::use_!("query UserCounter in counter-app-worker/tests/high_scores_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .order_by_value(valence::SortDirection::Desc)
         .limit(10)
         .await
@@ -47,7 +47,7 @@ async fn high_scores_ordered_desc_happy() {
 #[tokio::test]
 async fn high_scores_empty_board_sad() {
     let v = system_valence().await;
-    let rows = UserCounter::query(&v)
+    let rows = UserCounter::query_used(&v, valence::use_!("query UserCounter in counter-app-worker/tests/high_scores_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .order_by_value(valence::SortDirection::Desc)
         .limit(10)
         .await
@@ -62,7 +62,7 @@ async fn high_scores_offset_limit_middle_page_happy() {
     upsert_score(&v, "hs_high", 50).await;
     upsert_score(&v, "hs_mid", 30).await;
 
-    let page = UserCounter::query(&v)
+    let page = UserCounter::query_used(&v, valence::use_!("query UserCounter in counter-app-worker/tests/high_scores_contract.rs; Valence persistence for this feature path; typed store; visible to test harness."))
         .order_by_value(valence::SortDirection::Desc)
         .limit(1)
         .offset(1)

@@ -38,7 +38,7 @@ pub async fn ensure_bot_users_seed(valence: &Valence) -> Result<()> {
     let mut created = 0u32;
 
     for bot in BOT_ROSTER {
-        let existing_email = AccountEmail::query(valence)
+        let existing_email = AccountEmail::query_used(valence, valence::use_!("query AccountEmail in scripts/ensure_bot_users/mod.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
             .where_address(StringPredicate::Equals(bot.email.to_string()))
             .limit(1)
             .first()
@@ -48,7 +48,7 @@ pub async fn ensure_bot_users_seed(valence: &Valence) -> Result<()> {
             let Some(email_id) = email_row.id().cloned() else {
                 anyhow::bail!("Bot email {} missing id", bot.email);
             };
-            let existing = User::query(valence)
+            let existing = User::query_used(valence, valence::use_!("query User in scripts/ensure_bot_users/mod.rs; Valence persistence for this feature path; typed store; visible to session actor / service path."))
                 .where_primary_email(RecordPredicate::Equals(email_id))
                 .limit(1)
                 .first()
