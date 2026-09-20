@@ -9,6 +9,7 @@ use valence::prelude::*;
 // Trait exercised by Valence trait-detail E2E (connections + Used By on `user_counter`).
 valence_trait_schema! {
     UserLinkedCounter {
+        repository: "https://github.com/unified-field-dev/counter-app",
         fields: [
             value: {
                 r#type: FieldType::Integer,
