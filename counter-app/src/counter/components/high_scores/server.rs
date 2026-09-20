@@ -85,8 +85,17 @@ pub async fn get_high_scores_page(
             continue;
         };
         let count = count_to_usize(*counter.value());
-        let display_name = if let Ok(user) = counter.get_user(&v_scores).await {
-            user.get_profile(&v_viewer)
+        let display_name = if let Ok(user) = counter
+            .get_user_used(
+                &v_scores,
+                valence::use_!(r#"On the **high scores** board, we **follow each score's user link** so we can resolve who holds that count. The app uses this only to look up a display name for the leaderboard row."#),
+            )
+            .await
+        {
+            user.get_profile_used(
+                &v_viewer,
+                valence::use_!(r#"On the **high scores** board, we **load that user's profile** so we can show a display name next to their score. Other players see that name on the public leaderboard, or a redacted label when the profile is missing."#),
+            )
                 .await
                 .unwrap_or_default()
                 .into_iter()

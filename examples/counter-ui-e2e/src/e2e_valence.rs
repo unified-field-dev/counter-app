@@ -281,7 +281,11 @@ async fn wire_counter_admin_group(grant_actor: &Valence, system: &Valence, user_
             .expect("get user principal")
             .expect("user principal exists");
     group
-        .relate_to_member_record(principal.id().expect("principal id"), system)
+        .relate_to_member_record_used(
+            principal.id().expect("principal id"),
+            system,
+            valence::use_!(r#"**Test:** Fixture **member edge** write in `e2e_valence` so the suite can put a user in the counter_admin group. CI and developers running the suite only."#),
+        )
         .await
         .expect("relate counter_admin member");
 }
@@ -329,11 +333,19 @@ async fn seed_super_user_with_member(system: &Valence, member_user_id: &str) {
     .await
     .expect("upsert principal");
     created
-        .relate_to_owner_record(principal.id().expect("principal id"), system)
+        .relate_to_owner_record_used(
+            principal.id().expect("principal id"),
+            system,
+            valence::use_!(r#"**Test:** Fixture **owner edge** write in `e2e_valence` so the suite can arrange Gauge super-user membership. CI and developers running the suite only."#),
+        )
         .await
         .expect("relate super owner");
     created
-        .relate_to_member_record(principal.id().expect("principal id"), system)
+        .relate_to_member_record_used(
+            principal.id().expect("principal id"),
+            system,
+            valence::use_!(r#"**Test:** Fixture **member edge** write in `e2e_valence` so the suite can arrange Gauge super-user membership. CI and developers running the suite only."#),
+        )
         .await
         .expect("relate super member");
 }
@@ -352,6 +364,18 @@ async fn demote_owner_from_super_user(system: &Valence) {
         return;
     };
     let pid = principal.id().expect("principal id").clone();
-    let _ = super_group.unrelate_from_member_record(&pid, system).await;
-    let _ = super_group.unrelate_from_owner_record(&pid, system).await;
+    let _ = super_group
+        .unrelate_from_member_record_used(
+            &pid,
+            system,
+            valence::use_!(r#"**Test:** Fixture **member edge** remove in `e2e_valence` so the suite can demote the owner from super-user after grants. CI and developers running the suite only."#),
+        )
+        .await;
+    let _ = super_group
+        .unrelate_from_owner_record_used(
+            &pid,
+            system,
+            valence::use_!(r#"**Test:** Fixture **owner edge** remove in `e2e_valence` so the suite can demote the owner from super-user after grants. CI and developers running the suite only."#),
+        )
+        .await;
 }
