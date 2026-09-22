@@ -81,6 +81,26 @@ jobs:
           cargo doc -p counter-app-worker -p counter-app-spectra-topics --no-deps
           cargo doc -p counter-app --features ssr --no-deps
 
+  deny:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - uses: EmbarkStudios/cargo-deny-action@3c6349835b2b7b196a839186cb8b78e02f7b5f25 # v2.1.1
+        with:
+          command: check
+
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
+      - name: Security audit
+        # RUSTSEC-2023-0071 (rsa): Marvin Attack timing sidechannel, no fixed
+        # upgrade available upstream. RUSTSEC-2026-0285 (rustls) is left
+        # unignored on purpose -- see deny.toml for why this gate stays red.
+        run: |
+          cargo install cargo-audit --locked
+          cargo audit --ignore RUSTSEC-2023-0071
+
   e2e:
     runs-on: ubuntu-latest
     steps:
