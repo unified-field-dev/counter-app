@@ -14,7 +14,7 @@ use valence::{extract_id_from_record, Model, Valence};
 pub async fn primary_email_address(user: &User, valence: &Valence) -> Option<String> {
     let email_id = user.primary_email()?;
     let bare = extract_id_from_record(email_id).ok()?;
-    AccountEmail::get_used(&bare, valence, valence::use_!(r#"In **Counter app**, we **load Account Email** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#))
+    AccountEmail::get(&bare, valence, valence::use_!(r#"In **Counter app**, we **load Account Email** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#))
         .await
         .ok()
         .flatten()

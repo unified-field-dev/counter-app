@@ -69,7 +69,7 @@ pub async fn seed_counters(
         permission_cache,
     );
 
-    Counter::upsert_used(
+    Counter::upsert(
         "singleton",
         Counter::new(seed_value).context("Counter::new for seed")?,
         &v_seed,
@@ -78,7 +78,7 @@ pub async fn seed_counters(
     .await
     .context("seed Counter singleton")?;
 
-    UserCounter::upsert_used(
+    UserCounter::upsert(
         &user_pk,
         UserCounter::new(user_record, seed_value).context("UserCounter::new for seed")?,
         &v_seed,

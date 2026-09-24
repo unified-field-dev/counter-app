@@ -15,12 +15,12 @@ pub async fn run_write_once(v: &Valence, user_pk: &str) -> Result<WriteStepMs> {
     let total_start = Instant::now();
 
     let t0 = Instant::now();
-    let user_counter = UserCounter::get_used(user_pk, v, valence::use_!(r#"**Test:** Fixture **User Counter** load for `ops` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let user_counter = UserCounter::get(user_pk, v, valence::use_!(r#"**Test:** Fixture **User Counter** load for `ops` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await
         .context("UserCounter::get")?
         .context("user_counter row missing — seed failed")?;
     let updated_user = user_counter
-        .get_mutable_used(v, valence::use_!(r#"**Test:** Fixture **this data** access in `write` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
+        .get_mutable(v, valence::use_!(r#"**Test:** Fixture **this data** access in `write` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
         .set_value(*user_counter.value() + 1)
         .context("UserCounter set_value")?
         .commit()
@@ -30,12 +30,12 @@ pub async fn run_write_once(v: &Valence, user_pk: &str) -> Result<WriteStepMs> {
     let user_counter_commit_ms = elapsed_ms(t0);
 
     let t1 = Instant::now();
-    let global = Counter::get_used("singleton", v, valence::use_!(r#"**Test:** Fixture **Counter** load for `ops` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let global = Counter::get("singleton", v, valence::use_!(r#"**Test:** Fixture **Counter** load for `ops` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
         .await
         .context("Counter::get")?
         .context("counter singleton missing — seed failed")?;
     let updated_global = global
-        .get_mutable_used(v, valence::use_!(r#"**Test:** Fixture **this data** access in `write` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
+        .get_mutable(v, valence::use_!(r#"**Test:** Fixture **this data** access in `write` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
         .set_value(*global.value() + 1)
         .context("Counter set_value")?
         .commit()

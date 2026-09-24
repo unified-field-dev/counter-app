@@ -55,7 +55,7 @@ async fn create_user(
     )
     .map_err(|e| anyhow::anyhow!("Failed to create user for {}: {e}", bot.email))?;
 
-    let user_created = User::create_used(user, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    let user_created = User::create(user, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create user for {}: {e}", bot.email))?;
     let user_thing = user_created
@@ -85,7 +85,7 @@ async fn create_account(
     )
     .map_err(|e| anyhow::anyhow!("Failed to create account for {}: {e}", bot.email))?;
 
-    let account_created = Account::create_used(account, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    let account_created = Account::create(account, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create account for {}: {e}", bot.email))?;
     let account_thing = account_created
@@ -107,7 +107,7 @@ async fn create_and_link_email(
 
     let email_row = AccountEmail::new(account_thing, bot.email.to_string(), Some(now), now, now)
         .map_err(|e| anyhow::anyhow!("Failed to build AccountEmail for {}: {e}", bot.email))?;
-    let email_created = AccountEmail::create_used(email_row, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account Email** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    let email_created = AccountEmail::create(email_row, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account Email** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create AccountEmail for {}: {e}", bot.email))?;
     let email_thing = email_created
@@ -116,7 +116,7 @@ async fn create_and_link_email(
         .ok_or_else(|| anyhow::anyhow!("Bot email {} missing id after create", bot.email))?;
 
     account_created
-        .get_mutable_used(valence, valence::use_!(r#"In **ensure bot users**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **ensure bot users** use the updated data; this is not a public export of unrelated fields."#))
+        .get_mutable(valence, valence::use_!(r#"In **ensure bot users**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **ensure bot users** use the updated data; this is not a public export of unrelated fields."#))
         .set_primary_email(email_thing.clone())
         .map_err(|e| anyhow::anyhow!("Failed to set account primary email for {}: {e}", bot.email))?
         .set_updated_at(now)
@@ -131,7 +131,7 @@ async fn create_and_link_email(
         })?;
 
     user_created
-        .get_mutable_used(valence, valence::use_!(r#"In **ensure bot users**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **ensure bot users** use the updated data; this is not a public export of unrelated fields."#))
+        .get_mutable(valence, valence::use_!(r#"In **ensure bot users**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **ensure bot users** use the updated data; this is not a public export of unrelated fields."#))
         .set_primary_email(email_thing)
         .map_err(|e| anyhow::anyhow!("Failed to set user primary email for {}: {e}", bot.email))?
         .set_updated_at(now)
@@ -165,7 +165,7 @@ async fn create_membership_and_profile(
         now,
     )
     .map_err(|e| anyhow::anyhow!("Failed to build membership for {}: {e}", bot.email))?;
-    AccountMembership::create_used(membership, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account Membership** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    AccountMembership::create(membership, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Account Membership** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create membership for {}: {e}", bot.email))?;
 
@@ -179,7 +179,7 @@ async fn create_membership_and_profile(
     )
     .map_err(|e| anyhow::anyhow!("Failed to build UserProfile for {}: {e}", bot.email))?;
 
-    UserProfile::create_used(profile, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Profile** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    UserProfile::create(profile, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Profile** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to create UserProfile for {}: {e}", bot.email))?;
 
@@ -194,7 +194,7 @@ async fn upsert_bot_counter(valence: &Valence, bot: &BotDef, user_thing: RecordI
 
     let counter = UserCounter::new(user_thing, bot.reset_score)
         .map_err(|e| anyhow::anyhow!("Failed to create UserCounter for {}: {e}", bot.email))?;
-    UserCounter::upsert_used(&user_id_clean, counter, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+    UserCounter::upsert(&user_id_clean, counter, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
         .await
         .map_err(|e| anyhow::anyhow!("Failed to upsert UserCounter for {}: {e}", bot.email))?;
 

@@ -61,7 +61,7 @@ pub async fn get_high_scores_page(
     // slice — follow-up pages used to set `total_count: None` and used `db_rows_fetched > limit`,
     // which keeps `has_more` true after the final full fetch and hides the end-of-list UI.
     let total_rows = u64::try_from(
-        UserCounter::query_used(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+        UserCounter::query(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
             .await
             .map_err(|e| into_server_error(ctx_valence_err("get_high_scores_page count", e)))?
             .len(),
@@ -69,7 +69,7 @@ pub async fn get_high_scores_page(
     .unwrap_or(u64::MAX);
     let total_count = Some(total_rows);
 
-    let counters = UserCounter::query_used(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+    let counters = UserCounter::query(&v_scores, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
         .order_by_value(valence::SortDirection::Desc)
         .limit(fetch_n)
         .offset(offset)
@@ -86,13 +86,13 @@ pub async fn get_high_scores_page(
         };
         let count = count_to_usize(*counter.value());
         let display_name = if let Ok(user) = counter
-            .get_user_used(
+            .get_user(
                 &v_scores,
                 valence::use_!(r#"On the **high scores** board, we **follow each score's user link** so we can resolve who holds that count. The app uses this only to look up a display name for the leaderboard row."#),
             )
             .await
         {
-            user.get_profile_used(
+            user.get_profile(
                 &v_viewer,
                 valence::use_!(r#"On the **high scores** board, we **load that user's profile** so we can show a display name next to their score. Other players see that name on the public leaderboard, or a redacted label when the profile is missing."#),
             )
