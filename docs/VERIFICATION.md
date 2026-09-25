@@ -140,10 +140,6 @@ RUSTDOCFLAGS="-D rustdoc::broken-intra-doc-links" cargo doc \
   -p counter-app --features ssr --no-deps
 ```
 
-For guide-contract audits, point `CARGO_TARGET_DIR` at the same tree as
-`uf-docs-guide-contracts/workspaces/counter-app/doc-guide-spec.toml` `doc_root`
-(typically `uf-docs-data/target-counter-app`).
-
 `counter-app` still uses `#![allow(missing_docs)]` on macro-heavy UI surfaces
 (`uf_app!`, `orbital_routes_extract`). Hand-written items carry teaching rustdoc.
 
