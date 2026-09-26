@@ -165,7 +165,7 @@ fn ensure_may_mutate_user_counter(v: &Valence, user_id: &str) -> Result<(), Coun
 /// ```
 pub async fn get_global(v: &Valence) -> Result<CounterResponse, CounterServiceError> {
     // Generated model API: `Counter::get(id, &valence)` — missing row is fine (→ 0).
-    let counter = Counter::get("singleton", v, valence::use_!(r#"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let counter = Counter::get("singleton", v, valence::use_!(r"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let value = counter.map_or(0, |c| count_to_usize(*c.value()));
     Ok(CounterResponse { value })
 }
@@ -203,12 +203,12 @@ pub async fn increment_global(
     validate_increment_amount(amount)?;
     let amount_i64 = amount_as_i64(amount)?;
 
-    let counter = Counter::get("singleton", v, valence::use_!(r#"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let counter = Counter::get("singleton", v, valence::use_!(r"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let updated = if let Some(counter) = counter {
         // Existing row: get_mutable → field setter → commit (Valence unit of work).
         let next = counter.value() + amount_i64;
         counter
-            .get_mutable(v, valence::use_!(r#"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."#))
+            .get_mutable(v, valence::use_!(r"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -217,7 +217,7 @@ pub async fn increment_global(
         // First write: build a new model and upsert under the fixed singleton id.
         let new_counter =
             Counter::new(amount_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        Counter::upsert("singleton", new_counter, v, valence::use_!(r#"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#)).await?
+        Counter::upsert("singleton", new_counter, v, valence::use_!(r"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields.")).await?
     };
 
     Ok(CounterResponse {
@@ -253,7 +253,7 @@ pub async fn set_global(value: usize, v: &Valence) -> Result<CounterResponse, Co
     let new_counter =
         Counter::new(value_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
     // Upsert = replace-or-create under a stable id (admin/demo absolute write).
-    let updated = Counter::upsert("singleton", new_counter, v, valence::use_!(r#"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#)).await?;
+    let updated = Counter::upsert("singleton", new_counter, v, valence::use_!(r"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields.")).await?;
     Ok(CounterResponse {
         value: count_to_usize(*updated.value()),
     })
@@ -285,10 +285,10 @@ pub async fn get_user(
     user_id: &str,
     v: &Valence,
 ) -> Result<UserCounterResponse, CounterServiceError> {
-    let user_counter = UserCounter::get(user_id, v, valence::use_!(r#"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let user_counter = UserCounter::get(user_id, v, valence::use_!(r"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let user_count = user_counter.map_or(0, |c| count_to_usize(*c.value()));
 
-    let global_counter = Counter::get("singleton", v, valence::use_!(r#"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let global_counter = Counter::get("singleton", v, valence::use_!(r"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let global_count = global_counter.map_or(0, |c| count_to_usize(*c.value()));
 
     Ok(UserCounterResponse {
@@ -342,11 +342,11 @@ pub async fn increment_user(
     let user_thing = RecordId::new("user", bare_record_id(user_id));
 
     // --- personal UserCounter ---
-    let user_counter = UserCounter::get(user_id, v, valence::use_!(r#"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let user_counter = UserCounter::get(user_id, v, valence::use_!(r"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let new_user_val = if let Some(counter) = user_counter {
         let next = counter.value() + amount_i64;
         let updated = counter
-            .get_mutable(v, valence::use_!(r#"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."#))
+            .get_mutable(v, valence::use_!(r"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -356,16 +356,16 @@ pub async fn increment_user(
     } else {
         let new_counter = UserCounter::new(user_thing, amount_i64)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        let updated = UserCounter::upsert(user_id, new_counter, v, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#)).await?;
+        let updated = UserCounter::upsert(user_id, new_counter, v, valence::use_!(r"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields.")).await?;
         count_to_usize(*updated.value())
     };
 
     // --- shared global Counter (same pattern as increment_global) ---
-    let global_counter = Counter::get("singleton", v, valence::use_!(r#"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let global_counter = Counter::get("singleton", v, valence::use_!(r"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let new_global_val = if let Some(counter) = global_counter {
         let next = counter.value() + amount_i64;
         let updated = counter
-            .get_mutable(v, valence::use_!(r#"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."#))
+            .get_mutable(v, valence::use_!(r"In **counter app worker**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **counter app worker** use the updated data; this is not a public export of unrelated fields."))
             .set_value(next)
             .map_err(|e| CounterServiceError::Validation(e.to_string()))?
             .commit()
@@ -374,7 +374,7 @@ pub async fn increment_user(
     } else {
         let new_counter =
             Counter::new(amount_i64).map_err(|e| CounterServiceError::Validation(e.to_string()))?;
-        let updated = Counter::upsert("singleton", new_counter, v, valence::use_!(r#"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#)).await?;
+        let updated = Counter::upsert("singleton", new_counter, v, valence::use_!(r"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields.")).await?;
         count_to_usize(*updated.value())
     };
 

@@ -38,7 +38,7 @@ pub async fn ensure_bot_users_seed(valence: &Valence) -> Result<()> {
     let mut created = 0u32;
 
     for bot in BOT_ROSTER {
-        let existing_email = AccountEmail::query(valence, valence::use_!(r#"In **Counter app**, we **list Account Email** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+        let existing_email = AccountEmail::query(valence, valence::use_!(r"In **Counter app**, we **list Account Email** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."))
             .where_address(StringPredicate::Equals(bot.email.to_string()))
             .limit(1)
             .first()
@@ -48,7 +48,7 @@ pub async fn ensure_bot_users_seed(valence: &Valence) -> Result<()> {
             let Some(email_id) = email_row.id().cloned() else {
                 anyhow::bail!("Bot email {} missing id", bot.email);
             };
-            let existing = User::query(valence, valence::use_!(r#"In **Counter app**, we **list User** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+            let existing = User::query(valence, valence::use_!(r"In **Counter app**, we **list User** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."))
                 .where_primary_email(RecordPredicate::Equals(email_id))
                 .limit(1)
                 .first()

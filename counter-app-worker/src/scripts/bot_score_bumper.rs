@@ -53,7 +53,7 @@ pub async fn bot_score_bumper_with_valence(valence: &Valence) -> Result<()> {
     log::info!("[counter-app-worker] bot_score_bumper: Starting");
 
     // ── 1. Fetch the full leaderboard ───────────────────────────────────
-    let counters = UserCounter::query(valence, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+    let counters = UserCounter::query(valence, valence::use_!(r"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."))
         .order_by_value(valence::SortDirection::Desc)
         .await?;
 
@@ -69,7 +69,7 @@ pub async fn bot_score_bumper_with_valence(valence: &Valence) -> Result<()> {
         let user_record = counter.user().clone();
         let record_id = extract_id_from_record(counter.user()).unwrap_or_default();
 
-        let email = match GeneratedUser::get(&record_id, valence, valence::use_!(r#"In **Counter app**, we **load Generated User** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await {
+        let email = match GeneratedUser::get(&record_id, valence, valence::use_!(r"In **Counter app**, we **load Generated User** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await {
             Ok(Some(user)) => {
                 match super::user_email::primary_email_address(&user, valence).await {
                     Some(address) => address,
@@ -204,11 +204,11 @@ async fn update_bot_counter(
     entry: &LeaderboardEntry,
     new_score: i64,
 ) -> Result<()> {
-    let bot_counter = UserCounter::get(&entry.counter_id, valence, valence::use_!(r#"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let bot_counter = UserCounter::get(&entry.counter_id, valence, valence::use_!(r"In **Counter app**, we **load User Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
 
     if let Some(counter) = bot_counter {
         counter
-            .get_mutable(valence, valence::use_!(r#"In **scripts**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **scripts** use the updated data; this is not a public export of unrelated fields."#))
+            .get_mutable(valence, valence::use_!(r"In **scripts**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **scripts** use the updated data; this is not a public export of unrelated fields."))
             .set_value(new_score)
             .map_err(|e| anyhow::anyhow!("Failed to set bot score: {e}"))?
             .commit()
@@ -217,7 +217,7 @@ async fn update_bot_counter(
     } else {
         let new_counter = UserCounter::new(entry.user_record.clone(), new_score)
             .map_err(|e| anyhow::anyhow!("Failed to create bot counter: {e}"))?;
-        UserCounter::upsert(&entry.counter_id, new_counter, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+        UserCounter::upsert(&entry.counter_id, new_counter, valence, valence::use_!(r"When **Counter app** needs to persist work, we **save User Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to upsert bot counter: {e}"))?;
     }
@@ -226,11 +226,11 @@ async fn update_bot_counter(
 
 /// Add `score_delta` to the global singleton counter, returning its new value.
 async fn bump_global_counter(valence: &Valence, score_delta: i64) -> Result<usize> {
-    let global_counter = Counter::get("singleton", valence, valence::use_!(r#"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it."#)).await?;
+    let global_counter = Counter::get("singleton", valence, valence::use_!(r"In **Counter app**, we **load Counter** so the application can decide what to do next in this workflow. The result is used by **Counter app** logic—not necessarily displayed on a page unless that feature’s UI shows it.")).await?;
     let global_val = if let Some(counter) = global_counter {
         let updated_val = *counter.value() + score_delta;
         *counter
-            .get_mutable(valence, valence::use_!(r#"In **scripts**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **scripts** use the updated data; this is not a public export of unrelated fields."#))
+            .get_mutable(valence, valence::use_!(r"In **scripts**, we **update this data** so later steps see the latest values for this workflow. Callers allowed for **scripts** use the updated data; this is not a public export of unrelated fields."))
             .set_value(updated_val)
             .map_err(|e| anyhow::anyhow!("Failed to set global counter: {e}"))?
             .commit()
@@ -240,7 +240,7 @@ async fn bump_global_counter(valence: &Valence, score_delta: i64) -> Result<usiz
     } else {
         let new_counter = Counter::new(score_delta.max(0))
             .map_err(|e| anyhow::anyhow!("Failed to create global counter: {e}"))?;
-        *Counter::upsert("singleton", new_counter, valence, valence::use_!(r#"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."#))
+        *Counter::upsert("singleton", new_counter, valence, valence::use_!(r"When **Counter app** needs to persist work, we **save Counter** so the next step in that feature can continue with the latest values. People and services allowed for **Counter app** use this data for that workflow—not as a general export of unrelated personal fields."))
             .await
             .map_err(|e| anyhow::anyhow!("Failed to upsert global counter: {e}"))?
             .value()

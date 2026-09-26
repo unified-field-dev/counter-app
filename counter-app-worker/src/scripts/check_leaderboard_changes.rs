@@ -59,7 +59,7 @@ pub async fn check_leaderboard_changes_with_valence(
     log::info!("[counter-app-worker] check_leaderboard_changes: old={old_value}, new={new_value}");
 
     // 1. Query the current top 11 after the mutation has been persisted.
-    let current_top = UserCounter::query(valence, valence::use_!(r#"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."#))
+    let current_top = UserCounter::query(valence, valence::use_!(r"In **Counter app**, we **list User Counter** so the product can show or process the matching set for this workflow. Callers allowed for **Counter app** use the list; it is not a public dump of every field to anonymous visitors."))
         .order_by_value(valence::SortDirection::Desc)
         .limit(11)
         .await?;

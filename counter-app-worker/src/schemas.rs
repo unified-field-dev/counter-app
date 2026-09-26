@@ -1,28 +1,24 @@
-//! Product-local Valence schema sources for `Counter` and `UserCounter`.
+//! Force-link trait inventory only.
 //!
-//! Each submodule `include!`s a `valence_schema!` / `valence_trait_schema!` file from
-//! this crate's `schemas/` folder. The macros submit metadata through
-//! `valence::inventory`; [`valence::SchemaRegistry`] picks them up when the crate is
-//! linked — no manual registration call. Generated Rust models land in
-//! [`crate::generated`] via `build.rs`.
-//!
-//! ## Features
-//!
-//! - **Counter singleton** — global demo row (`table: "counter"`, id `"singleton"`)
-//!   with public read/update for anon increments.
-//! - **`UserCounter`** — per-user scores with `OWNER_BY_USER_FIELD` writes, public
-//!   leaderboard reads, and [`crate::side_effects::LeaderboardNotifier`].
-//! - **`UserLinkedCounter` trait** — shared field/connection shape used by trait-detail
-//!   E2E and the `UserCounter` schema `traits: […]` list.
-
-mod counter_schema {
-    include!("../schemas/counter_valence_schema.rs");
-}
+//! Entity schemas (`counter`, `user_counter`) are registered by
+//! `generated_models.rs` (build.rs / valence-codegen) with trait fields already
+//! merged. Do **not** also `include!` the `valence_schema!` sources here, or
+//! inventory submits a second [`valence::SchemaMetadataInit`] and panics under
+//! Valence duplicate registration rules.
 
 mod user_linked_counter_trait {
     include!("../schemas/user_linked_counter_valence_trait.rs");
+    #[doc(hidden)]
+    pub const __INVENTORY_LINK: () = ();
 }
 
-mod user_counter_schema {
-    include!("../schemas/user_counter_valence_schema.rs");
+/// Keep trait `inventory` submissions linked and retain generated model modules
+/// (which submit the complete entity [`valence::SchemaMetadataInit`] entries).
+#[inline(never)]
+pub fn ensure_inventory_linked() {
+    let _ = (
+        user_linked_counter_trait::__INVENTORY_LINK,
+        std::any::type_name::<crate::generated::Counter>(),
+        std::any::type_name::<crate::generated::UserCounter>(),
+    );
 }

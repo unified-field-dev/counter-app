@@ -12,6 +12,7 @@ use valence::{
 };
 
 fn prepare_test_env() {
+    counter_app_worker::touch_schema_inventory();
     valence::deletion::register_noop_deletion_dispatcher_for_tests();
     // Drop process-wide point-get cache so prior tests cannot satisfy `get` on a fresh DB.
     valence::clear_for_test();

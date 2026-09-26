@@ -254,7 +254,7 @@ async fn user_counter_valence_create_policy_denies_foreign_user_sad() {
         },
     );
     let forged = UserCounter::new(RecordId::new("user", "alice"), 1).expect("new");
-    let err = UserCounter::upsert("alice", forged, &v_bob, valence::use_!(r#"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let err = UserCounter::upsert("alice", forged, &v_bob, valence::use_!(r"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect_err("Valence create must deny foreign user field");
     assert!(

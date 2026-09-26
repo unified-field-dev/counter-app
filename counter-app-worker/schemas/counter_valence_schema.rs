@@ -13,6 +13,7 @@ valence_schema! {
         table: "counter",
         database: crate::embedded_surreal::DEFAULT_STORAGE,
         version: "0.1.0",
+        repository: "https://github.com/unified-field-dev/counter-app",
         description: "Simple counter for demonstration (PUBLIC_READ update is intentional: demo increments use user or system actors)",
         
         privacy: {

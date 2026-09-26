@@ -182,6 +182,21 @@ pub mod embedded_surreal;
 pub mod generated;
 mod schemas;
 
+/// Force-link schema/trait `inventory` submissions. Safe to call more than once.
+#[inline(never)]
+pub fn touch_schema_inventory() {
+    schemas::ensure_inventory_linked();
+    let _ = valence::TraitRegistry::global();
+}
+
+#[inline(never)]
+fn ensure_schema_inventory_linked() {
+    touch_schema_inventory();
+}
+
+#[used]
+static __COUNTER_WORKER_SCHEMA_INVENTORY: fn() = ensure_schema_inventory_linked;
+
 pub mod events;
 pub mod paths;
 pub mod scripts;

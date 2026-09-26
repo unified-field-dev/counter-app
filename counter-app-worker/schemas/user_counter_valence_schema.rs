@@ -15,6 +15,7 @@ valence_schema! {
         table: "user_counter",
         version: "0.1.0",
         database: crate::embedded_surreal::DEFAULT_STORAGE,
+        repository: "https://github.com/unified-field-dev/counter-app",
         description: "Per-user counter tracking for high scores and user-specific counts",
 
         traits: [UserLinkedCounter],

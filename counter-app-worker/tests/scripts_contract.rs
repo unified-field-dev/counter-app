@@ -45,7 +45,7 @@ async fn seed_real_user_with_email(
         now,
     )
     .expect("build user");
-    let user_created = User::upsert(user_id, user, valence, valence::use_!(r#"**Test:** Fixture **User** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let user_created = User::upsert(user_id, user, valence, valence::use_!(r"**Test:** Fixture **User** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert user");
     let user_thing = RecordId::new("user", user_id);
@@ -61,20 +61,20 @@ async fn seed_real_user_with_email(
         now,
     )
     .expect("build account");
-    let account_created = Account::create(account, valence, valence::use_!(r#"**Test:** Fixture **Account** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let account_created = Account::create(account, valence, valence::use_!(r"**Test:** Fixture **Account** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("create account");
     let account_thing = account_created.id().cloned().expect("account id");
 
     let email_row = AccountEmail::new(account_thing, email.to_string(), Some(now), now, now)
         .expect("build email");
-    let email_created = AccountEmail::create(email_row, valence, valence::use_!(r#"**Test:** Fixture **Account Email** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let email_created = AccountEmail::create(email_row, valence, valence::use_!(r"**Test:** Fixture **Account Email** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("create email");
     let email_thing = email_created.id().cloned().expect("email id");
 
     account_created
-        .get_mutable(valence, valence::use_!(r#"**Test:** Fixture **this data** access in `scripts_contract` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
+        .get_mutable(valence, valence::use_!(r"**Test:** Fixture **this data** access in `scripts_contract` so the suite can arrange and assert persistence. CI and developers running the suite only."))
         .set_primary_email(email_thing.clone())
         .expect("set account email")
         .set_updated_at(now)
@@ -84,7 +84,7 @@ async fn seed_real_user_with_email(
         .expect("commit account");
 
     user_created
-        .get_mutable(valence, valence::use_!(r#"**Test:** Fixture **this data** access in `scripts_contract` so the suite can arrange and assert persistence. CI and developers running the suite only."#))
+        .get_mutable(valence, valence::use_!(r"**Test:** Fixture **this data** access in `scripts_contract` so the suite can arrange and assert persistence. CI and developers running the suite only."))
         .set_primary_email(email_thing)
         .expect("set user email")
         .set_updated_at(now)
@@ -94,13 +94,13 @@ async fn seed_real_user_with_email(
         .expect("commit user");
 
     let counter = UserCounter::new(user_thing, score).expect("new counter");
-    UserCounter::upsert(user_id, counter, valence, valence::use_!(r#"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    UserCounter::upsert(user_id, counter, valence, valence::use_!(r"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert counter");
 }
 
 async fn leaderboard_notifications_for(valence: &Valence, user_id: &str) -> Vec<Notification> {
-    Notification::query(valence, valence::use_!(r#"**Test:** Fixture **Notification** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    Notification::query(valence, valence::use_!(r"**Test:** Fixture **Notification** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .where_user(RecordPredicate::Equals(RecordId::new("user", user_id)))
         .where_kind(StringPredicate::Equals("leaderboard".into()))
         .await
@@ -109,7 +109,7 @@ async fn leaderboard_notifications_for(valence: &Valence, user_id: &str) -> Vec<
 
 async fn upsert_score(valence: &Valence, user_id: &str, score: i64) {
     let row = UserCounter::new(RecordId::new("user", user_id), score).expect("new");
-    UserCounter::upsert(user_id, row, valence, valence::use_!(r#"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    UserCounter::upsert(user_id, row, valence, valence::use_!(r"**Test:** Fixture **User Counter** save for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("upsert");
 }
@@ -120,7 +120,7 @@ async fn ensure_bot_users_seed_happy() {
     ensure_bot_users_seed(&v).await.expect("seed bots");
 
     for bot in BOT_ROSTER {
-        let email = AccountEmail::query(&v, valence::use_!(r#"**Test:** Fixture **Account Email** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        let email = AccountEmail::query(&v, valence::use_!(r"**Test:** Fixture **Account Email** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .where_address(StringPredicate::Equals(bot.email.to_string()))
             .limit(1)
             .first()
@@ -133,7 +133,7 @@ async fn ensure_bot_users_seed_happy() {
         );
     }
 
-    let counters = UserCounter::query(&v, valence::use_!(r#"**Test:** Fixture **User Counter** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await.expect("counters");
+    let counters = UserCounter::query(&v, valence::use_!(r"**Test:** Fixture **User Counter** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only.")).await.expect("counters");
     assert_eq!(
         counters.len(),
         BOT_ROSTER.len(),
@@ -161,7 +161,7 @@ async fn bot_score_bumper_with_valence_happy() {
         .await
         .expect("bumper should succeed");
 
-    let counters = UserCounter::query(&v, valence::use_!(r#"**Test:** Fixture **User Counter** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let counters = UserCounter::query(&v, valence::use_!(r"**Test:** Fixture **User Counter** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .order_by_value(valence::SortDirection::Desc)
         .await
         .expect("query");
@@ -174,10 +174,10 @@ async fn bot_score_bumper_with_valence_happy() {
         }
         // Bot counters use the generated user id (not email). Resolve via email walk.
         let record_id = valence::extract_id_from_record(c.user()).unwrap_or_default();
-        if let Ok(Some(user)) = User::get(&record_id, &v, valence::use_!(r#"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await {
+        if let Ok(Some(user)) = User::get(&record_id, &v, valence::use_!(r"**Test:** Fixture **User** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only.")).await {
             if let Some(email_id) = user.primary_email() {
                 if let Ok(bare) = valence::extract_id_from_record(email_id) {
-                    if let Ok(Some(email_row)) = AccountEmail::get(&bare, &v, valence::use_!(r#"**Test:** Fixture **Account Email** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#)).await {
+                    if let Ok(Some(email_row)) = AccountEmail::get(&bare, &v, valence::use_!(r"**Test:** Fixture **Account Email** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only.")).await {
                         let addr = email_row.address();
                         if addr.starts_with("top") && addr.ends_with("@example.com") {
                             max_top_bot = max_top_bot.max(*c.value());
@@ -217,7 +217,7 @@ async fn daily_highscores_reset_with_valence_happy() {
     assert_eq!(bob.user_count, 0, "real user must reset to 0");
 
     for bot in BOT_ROSTER {
-        let email = AccountEmail::query(&v, valence::use_!(r#"**Test:** Fixture **Account Email** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        let email = AccountEmail::query(&v, valence::use_!(r"**Test:** Fixture **Account Email** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .where_address(StringPredicate::Equals(bot.email.to_string()))
             .limit(1)
             .first()
@@ -225,7 +225,7 @@ async fn daily_highscores_reset_with_valence_happy() {
             .expect("email")
             .expect("bot email present");
         let email_id = email.id().cloned().expect("email id");
-        let user = User::query(&v, valence::use_!(r#"**Test:** Fixture **User** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        let user = User::query(&v, valence::use_!(r"**Test:** Fixture **User** list for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .where_primary_email(RecordPredicate::Equals(email_id))
             .limit(1)
             .first()
@@ -233,7 +233,7 @@ async fn daily_highscores_reset_with_valence_happy() {
             .expect("user query")
             .expect("bot user");
         let uid = valence::extract_id_from_record(user.id().expect("user id")).expect("bare id");
-        let counter = UserCounter::get(&uid, &v, valence::use_!(r#"**Test:** Fixture **User Counter** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+        let counter = UserCounter::get(&uid, &v, valence::use_!(r"**Test:** Fixture **User Counter** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
             .await
             .expect("get")
             .expect("bot counter");
@@ -247,7 +247,7 @@ async fn daily_highscores_reset_with_valence_happy() {
     }
 
     let max_bot_reset = BOT_ROSTER.iter().map(|b| b.reset_score).max().unwrap_or(0);
-    let global = Counter::get("singleton", &v, valence::use_!(r#"**Test:** Fixture **Counter** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."#))
+    let global = Counter::get("singleton", &v, valence::use_!(r"**Test:** Fixture **Counter** load for `tests` so the suite can arrange and assert persistence behavior. CI and developers running the suite only."))
         .await
         .expect("global get")
         .expect("global exists");
