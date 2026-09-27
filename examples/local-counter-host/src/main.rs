@@ -24,7 +24,7 @@
 //! Stdout prints `local_counter_host: OK — /counter deny/allow + get/increment/set`.
 //!
 //! ## Look next
-//! Mount `<CounterRoutes />` in an L4 embedded/remote host; register Chronon/Boson
+//! Mount `<CounterRoutes />` in an embedded or remote host; register Chronon/Boson
 //! pieces from `counter-app-worker`; resolve request Valence via `higgs::Higgs::from_request + valence`.
 
 #![allow(clippy::print_stdout, clippy::unwrap_used, clippy::expect_used)]

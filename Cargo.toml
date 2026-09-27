@@ -111,8 +111,7 @@ chronon-coordinator-macros = { git = "https://github.com/unified-field-dev/chron
 chronon-valence-identity = { git = "https://github.com/unified-field-dev/chronon-valence-identity", branch = "main" }
 boson-valence-identity = { git = "https://github.com/unified-field-dev/boson-valence-identity", branch = "main" }
 
-# Chronon / Boson / Photon / Spectra / Quark — Chronon monorepo L0 path
-# (patched for git pins elsewhere).
+# Chronon / Boson / Photon / Spectra / Quark.
 chronon = { package = "uf-chronon", git = "https://github.com/unified-field-dev/chronon", branch = "main", default-features = false }
 chronon-core = { git = "https://github.com/unified-field-dev/chronon", branch = "main" }
 chronon-executor = { git = "https://github.com/unified-field-dev/chronon", branch = "main" }
