@@ -160,7 +160,7 @@ async fn create_membership_and_profile(
     let membership = AccountMembership::new(
         account_thing,
         user_thing.clone(),
-        AccountMembershipRole::Owner,
+        AccountMembershipRole::Member,
         now,
         now,
     )
