@@ -187,6 +187,7 @@ uf_app! {
     version: "0.1.0",
     routes: CounterRoutes,
     route_path: "/counter",
+    repository: "https://github.com/unified-field-dev/counter-app",
     permission_manifest: permissions::CounterPermission,
 }
 
