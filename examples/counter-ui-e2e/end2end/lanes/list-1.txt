@@ -1,0 +1,15 @@
+auth_admin.spec.ts › pw-counter-auth-admin › pw-counter-admin-set-happy
+auth_admin.spec.ts › pw-counter-auth-admin › pw-counter-user-incr-happy
+auth_admin.spec.ts › pw-counter-auth-admin › pw-counter-admin-gate-sad
+auth_admin.spec.ts › pw-counter-auth-admin › pw-counter-admin-gate-unverified-sad
+auth_admin.spec.ts › pw-counter-auth-admin › pw-counter-admin-perm-sad
+batch.spec.ts › pw-counter-batch › pw-counter-live-batch-idle-happy
+batch.spec.ts › pw-counter-batch › pw-counter-live-batch-max-age-happy
+floaters.spec.ts › pw-counter-floaters › pw-counter-floater-spawn-happy
+floaters.spec.ts › pw-counter-floaters › pw-counter-floater-variance-happy
+leaderboard.spec.ts › pw-counter-leaderboard › pw-counter-leaderboard-page-happy
+live.spec.ts › pw-counter-live › pw-counter-lab-boot-happy
+live.spec.ts › pw-counter-live › pw-counter-live-anon-incr-happy
+live.spec.ts › pw-counter-live › pw-counter-live-validation-sad
+live.spec.ts › pw-counter-live › pw-counter-anon-rate-limit-sad
+photon.spec.ts › pw-counter-photon › pw-counter-photon-refetch-happy
