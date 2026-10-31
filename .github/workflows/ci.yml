@@ -95,8 +95,8 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5.1.0
       - name: Security audit
         # RUSTSEC-2023-0071 (rsa): Marvin Attack timing sidechannel, no fixed
-        # upgrade available upstream. RUSTSEC-2026-0285 (rustls) is left
-        # unignored on purpose -- see deny.toml for why this gate stays red.
+        # upgrade available upstream. Also ignored in .cargo/audit.toml; kept
+        # here too so the flag stays explicit about why this gate is green.
         run: |
           cargo install cargo-audit --locked
           cargo audit --ignore RUSTSEC-2023-0071
