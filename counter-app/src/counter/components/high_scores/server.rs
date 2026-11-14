@@ -130,6 +130,8 @@ pub async fn get_high_scores_page(
         has_more,
         total_count,
         next_request_offset: Some(next_request_offset),
+        // Offset paging; the leaderboard has no keyset cursor.
+        next_cursor: None,
     })
 }
 
